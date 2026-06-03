@@ -1,13 +1,11 @@
 <h1 align="center">🤖 DocBot — Company Document Chatbot</h1>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white" />
-  <img src="https://img.shields.io/badge/FastAPI-0.100%2B-009688?logo=fastapi&logoColor=white" />
-  <img src="https://img.shields.io/badge/LangChain-RAG-blueviolet?logo=chainlink&logoColor=white" />
-  <img src="https://img.shields.io/badge/ChromaDB-Vector%20Store-orange" />
-  <img src="https://img.shields.io/badge/Ollama-Local%20LLM-black?logo=ollama&logoColor=white" />
-  <img src="https://img.shields.io/badge/License-MIT-green" />
-</p>
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://docs.python.org/3/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![LangChain](https://img.shields.io/badge/LangChain-RAG-blueviolet?logo=chainlink&logoColor=white)](https://python.langchain.com/docs/introduction/)
+![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector%20Store-orange)
+[![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-black?logo=ollama&logoColor=white)](https://ollama.com/library)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 <p align="center">
   <strong>A fully local, privacy-first RAG chatbot for company policy and HR documents — no paid APIs, no data leaving your machine.</strong>
