@@ -1,14 +1,19 @@
 from langchain_ollama import OllamaLLM
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 
 import config
 from app.prompts import SYSTEM_PROMPT, RAG_PROMPT_TEMPLATE
 from app.retriever import get_retriever
 
 
-def build_chain() -> RetrievalQA:
-    """Assemble and return the LangChain RetrievalQA chain."""
+def _format_docs(docs: list) -> str:
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
+def build_chain():
+    """Assemble and return a LangChain LCEL RAG chain."""
     llm = OllamaLLM(
         model=config.CHAT_MODEL,
         base_url=config.OLLAMA_BASE_URL,
@@ -21,11 +26,13 @@ def build_chain() -> RetrievalQA:
 
     retriever = get_retriever()
 
-    chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=retriever,
-        return_source_documents=True,
-        chain_type_kwargs={"prompt": prompt},
+    chain = (
+        RunnablePassthrough.assign(
+            context=lambda x: _format_docs(retriever.invoke(x["question"])),
+        )
+        | prompt
+        | llm
+        | StrOutputParser()
     )
-    return chain
+
+    return chain, retriever

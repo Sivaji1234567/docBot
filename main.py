@@ -6,15 +6,16 @@ from app.ingest import ingest_documents
 
 app = FastAPI(title="Docbot - Company Document Chatbot")
 
-# Chain is built lazily on first /chat request (requires docs to be ingested first)
+# Chain and retriever are built lazily on first /chat request
 _chain = None
+_retriever = None
 
 
 def get_chain():
-    global _chain
+    global _chain, _retriever
     if _chain is None:
-        _chain = build_chain()
-    return _chain
+        _chain, _retriever = build_chain()
+    return _chain, _retriever
 
 
 class ChatRequest(BaseModel):
@@ -38,10 +39,11 @@ def health():
 
 @app.post("/ingest", response_model=IngestResponse)
 def ingest():
-    global _chain
+    global _chain, _retriever
     try:
         chunks = ingest_documents()
         _chain = None  # Reset so next /chat reloads the updated vectorstore
+        _retriever = None
         return IngestResponse(status="ok", chunks_indexed=chunks)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -52,10 +54,9 @@ def chat(request: ChatRequest):
     if not request.question.strip():
         raise HTTPException(status_code=400, detail="Question cannot be empty.")
     try:
-        chain = get_chain()
-        result = chain.invoke({"query": request.question})
-        answer = result.get("result", "")
-        source_docs = result.get("source_documents", [])
+        chain, retriever = get_chain()
+        answer = chain.invoke({"question": request.question})
+        source_docs = retriever.invoke(request.question)
         sources = [doc.metadata.get("source", "unknown") for doc in source_docs]
         return ChatResponse(answer=answer, sources=list(set(sources)))
     except Exception as e:
